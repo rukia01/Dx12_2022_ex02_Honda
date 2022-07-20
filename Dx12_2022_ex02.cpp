@@ -244,6 +244,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{-0.4f,  0.7f, 0.0f} , // 左上 
 		{ 0.4f, -0.7f, 0.0f} , // 右下
 		{ 0.4f,  0.7f, 0.0f} , // 右上
+		{ 0.9f,  0.0f, 0.0f} ,
+		//2つめの三角形
+		{ -0.9f, -0.9f, 0.0f} , // 右下
+		{ -0.9f,  -0.6f, 0.0f} , // 右上
+		{ -0.6f,  -0.6f, 0.0f}
 	};
 
 	//XMFLOAT3 vertices[] = {	//TRIANGLELIST
@@ -308,7 +313,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	vbView.StrideInBytes = sizeof(vertices[0]); // 1頂点あたりのバイト数
 
 	//Chapter4_11_2 P150
-	unsigned short indices[] = { 0, 1, 2,    2, 1, 3 };
+	unsigned short indices[] = { 0, 1, 2,    2, 1, 3,    2, 3, 4,    6, 7, 5,};
 	ID3D12Resource* idxBuff = nullptr;
 	resdesc.Width = sizeof(indices);
 	result = _dev->CreateCommittedResource(
@@ -501,6 +506,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// Chapter4_10_3
 	float clearColor[] = { 0.125f, 0.125f, 0.125f, 1.0f }; //黄色
 
+	int frame = 0;
+
 	while (true) {
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
@@ -531,7 +538,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		auto rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 		rtvH.ptr += bbIdx * _dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		_cmdList->OMSetRenderTargets(1, &rtvH, true, nullptr);
+
+		clearColor[0] = sin(frame / 10.0f);
+		clearColor[1] = sin(frame / 11.0f);
+		clearColor[2] = sin(frame / 12.0f);
+		clearColor[3] = sin(frame / 13.0f);
+
 		_cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+
+		frame++;
+
+		//頂点情報の改造（アニメーションなど）
+		//vertices[3].x = -0.9f + (float)frame / 500.0f;
+		//
+		//result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+		//std::copy(std::begin(vertices), std::end(vertices), vertMap);
+		//vertBuff->Unmap(0, nullptr);
 
 
 		// Chapter4_10_3 P145 改造
@@ -543,7 +565,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//Chapter4_11_2 P151
 		_cmdList->IASetIndexBuffer(&ibView);
-		_cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		_cmdList->DrawIndexedInstanced(12, 1, 0, 0, 0);
 
 		//// Chapter3_4_3　 リソースバリア
 		BarrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
