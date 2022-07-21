@@ -238,13 +238,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ShowWindow(hwnd, SW_SHOW);
 
+	float ratio = (float)window_width / window_height;
+
 	//Chapter4_10_3 P146
 	XMFLOAT3 vertices[] = {
-		{-0.4f, -0.7f, 0.0f} , // 左下
-		{-0.4f,  0.7f, 0.0f} , // 左上 
-		{ 0.4f, -0.7f, 0.0f} , // 右下
-		{ 0.4f,  0.7f, 0.0f} , // 右上
-		{ 0.9f,  0.0f, 0.0f} ,
+		{0.0f, 0.5f, 0.0f} , // 左下
+		{0.25f * (float)sqrt(3) / ratio,  -0.25f * (float)sqrt(3) + 0.5f , 0.0f} , // 左上 
+		{ 0.25f / ratio, -0.25f * (float)sqrt(3), 0.0f} , // 右下
+		{ -0.25f / ratio,  -0.25f * (float)sqrt(3), 0.0f} , // 右上
+		{ -0.25f * (float)sqrt(3) / ratio,  -0.25f * (float)sqrt(3) + 0.5f , 0.0f} ,
 		//2つめの三角形
 		{ -0.9f, -0.9f, 0.0f} , // 右下
 		{ -0.9f,  -0.6f, 0.0f} , // 右上
@@ -313,7 +315,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	vbView.StrideInBytes = sizeof(vertices[0]); // 1頂点あたりのバイト数
 
 	//Chapter4_11_2 P150
-	unsigned short indices[] = { 0, 1, 2,    2, 1, 3,    2, 3, 4,    6, 7, 5,};
+	unsigned short indices[] = { 0, 1, 2,    0, 2, 3,    0, 3, 4,    6, 7, 5,};
 	ID3D12Resource* idxBuff = nullptr;
 	resdesc.Width = sizeof(indices);
 	result = _dev->CreateCommittedResource(
@@ -550,10 +552,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//頂点情報の改造（アニメーションなど）
 		//vertices[3].x = -0.9f + (float)frame / 500.0f;
-		//
-		//result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-		//std::copy(std::begin(vertices), std::end(vertices), vertMap);
-		//vertBuff->Unmap(0, nullptr);
+		
+		result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+		std::copy(std::begin(vertices), std::end(vertices), vertMap);
+		vertBuff->Unmap(0, nullptr);
 
 
 		// Chapter4_10_3 P145 改造
