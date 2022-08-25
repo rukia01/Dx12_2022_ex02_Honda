@@ -541,10 +541,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		rtvH.ptr += bbIdx * _dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		_cmdList->OMSetRenderTargets(1, &rtvH, true, nullptr);
 
-		clearColor[0] = sin(frame / 10.0f);
-		clearColor[1] = sin(frame / 11.0f);
-		clearColor[2] = sin(frame / 12.0f);
-		clearColor[3] = sin(frame / 13.0f);
+		clearColor[0] = sin(frame / 50.0f);
+		clearColor[1] = sin(frame / 100.0f);
+		clearColor[2] = sin(frame / 150.0f);
+		clearColor[3] = sin(frame / 200.0f);
 
 		_cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 
